@@ -13,4 +13,4 @@ tokio = { version = "1.47.0", features = ["rt-multi-thread", "macros"] }
 
 [dependencies.tmapi]
 git = "https://github.com/doomed-neko/tmapi"
-version = "0.1.1"
+version = "0.1.3"
