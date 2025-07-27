@@ -1,0 +1,17 @@
+[package]
+name = "tmgui"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+chrono = "0.4.41"
+eframe = { version = "0.32.0", features = ["default"] }
+egui_virtual_list = "0.8.0"
+futures = "0.3.31"
+rand = "0.9.2"
+tokio = { version = "1.47.0", features = ["rt-multi-thread", "macros"] }
+
+[dependencies.tmapi]
+git = "https://github.com/doomed-neko/tmapi"
+features = ["blocking"]
+version = "0.1.1"
