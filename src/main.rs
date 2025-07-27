@@ -2,8 +2,8 @@ use chrono::TimeZone;
 use eframe::{
     App,
     egui::{
-        self, CentralPanel, Color32, ComboBox, Context, FontId, Frame, ScrollArea, Stroke,
-        TextStyle, TopBottomPanel, ViewportBuilder, Window,
+        self, CentralPanel, ComboBox, Context, FontId, Frame, ScrollArea, Stroke, TextStyle,
+        TopBottomPanel, ViewportBuilder,
     },
 };
 use futures::executor::block_on;
@@ -197,7 +197,8 @@ impl App for TmApp {
     }
 }
 
-fn main() -> eframe::Result {
+#[tokio::main]
+async fn main() -> eframe::Result {
     let opts = eframe::NativeOptions {
         viewport: ViewportBuilder::default()
             .with_resizable(true)
