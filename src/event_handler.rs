@@ -1,5 +1,6 @@
 use std::sync::mpsc::{Receiver, Sender};
 
+use log::error;
 use tmapi::{Client, Email};
 use tokio::runtime::Handle;
 
@@ -56,7 +57,7 @@ impl Handler {
             Ok(_) => {
                 let _ = self.response_stream.send(EventResponse::EmailsDeleted);
             }
-            Err(e) => eprintln!("{e:?}"),
+            Err(e) => error!("Could not delete all emails{e:?}"),
         }
     }
     fn delete(&self, id: String, index: usize) {
@@ -68,34 +69,43 @@ impl Handler {
                     .response_stream
                     .send(EventResponse::EmailDeleted(index));
             }
-            Err(e) => eprintln!("{e:?}"),
+            Err(e) => error!("Could not delete email: {e:?}"),
         }
     }
 
     fn fetch_emails(&self, email: String, offset: u32) {
         let client = Client::new(email).unwrap();
         let emails = Handle::current().block_on(client.get_emails(50, 0));
-        if let Ok(emails) = emails {
-            if offset == 0 {
-                let _ = self.response_stream.send(EventResponse::Emails(emails));
-            } else {
-                let _ = self.response_stream.send(EventResponse::EmailsMore(emails));
+        match emails {
+            Ok(emails) => {
+                if offset == 0 {
+                    let _ = self.response_stream.send(EventResponse::Emails(emails));
+                } else {
+                    let _ = self.response_stream.send(EventResponse::EmailsMore(emails));
+                }
             }
+            Err(e) => error!("Could not fetch emails: {e:?}"),
         }
     }
     fn fetch_email(&self, id: String) {
         let client = Client::new("example@example.com").unwrap();
         let email = Handle::current().block_on(client.get_inbox(id));
-        if let Ok(email) = email {
-            let _ = self.response_stream.send(EventResponse::Email(email));
+        match email {
+            Ok(email) => {
+                let _ = self.response_stream.send(EventResponse::Email(email));
+            }
+            Err(e) => error!("Could not fetch email: {e:?}"),
         }
     }
 
     fn fetch_count(&self, email: String) {
         let client = Client::new(email).unwrap();
         let count = Handle::current().block_on(client.email_count());
-        if let Ok(count) = count {
-            let _ = self.response_stream.send(EventResponse::Count(count));
+        match count {
+            Ok(count) => {
+                let _ = self.response_stream.send(EventResponse::Count(count));
+            }
+            Err(e) => error!("Could not fetch count: {e:?}"),
         }
     }
 
@@ -106,7 +116,7 @@ impl Handler {
             Ok(domains) => {
                 let _ = self.response_stream.send(EventResponse::Domains(domains));
             }
-            Err(e) => eprintln!("{e:?}"),
+            Err(e) => error!("Could not fetch domains: {e:?}"),
         }
     }
 }

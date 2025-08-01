@@ -20,6 +20,7 @@ mod event_handler;
 
 #[tokio::main]
 async fn main() -> eframe::Result {
+    pretty_env_logger::init();
     let opts = eframe::NativeOptions {
         viewport: ViewportBuilder::default().with_app_id("adenosine.tmgui"),
         ..Default::default()
