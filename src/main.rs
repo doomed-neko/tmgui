@@ -316,7 +316,12 @@ impl App for TempMailApp {
             ui.vertical_centered_justified(|ui| {
                 ui.set_width(ui.available_width());
 
-                ui.heading(self.email());
+                ui.horizontal(|ui| {
+                    ui.heading(self.email());
+                    if ui.button("copy").clicked() {
+                        ctx.copy_text(self.email());
+                    }
+                });
                 self.email_selector(ui);
 
                 if self.viewed_email.is_some() && ui.button("Back to email list").clicked() {
