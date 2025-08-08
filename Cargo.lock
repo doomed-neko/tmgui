@@ -912,16 +912,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "egui_virtual_list"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "532c45e6075a2c44fd40cd094aea69a0aa77c0804e4d91f9e06cdecf7b84b557"
-dependencies = [
- "egui",
- "web-time",
-]
-
-[[package]]
 name = "email_address"
 version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3330,7 +3320,6 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "eframe",
- "egui_virtual_list",
  "log",
  "open",
  "pretty_env_logger",
