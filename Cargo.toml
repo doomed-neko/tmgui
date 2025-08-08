@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 chrono = "0.4.41"
 eframe = { version = "0.32.0", features = ["default"] }
-egui_virtual_list = "0.8.0"
 log = "0.4.27"
 open = "5.3.2"
 pretty_env_logger = "0.5.0"
