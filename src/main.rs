@@ -55,7 +55,16 @@ async fn main() -> eframe::Result {
     eframe::run_native(
         "TMApi",
         opts,
-        Box::new(|_| Ok(Box::new(TempMailApp::new(tx_event, rx_response)))),
+        Box::new(|c| {
+            let name = c.storage.and_then(|x| x.get_string("name"));
+            let domain = c.storage.and_then(|x| x.get_string("domain"));
+            Ok(Box::new(TempMailApp::new(
+                tx_event,
+                rx_response,
+                name,
+                domain,
+            )))
+        }),
     )
 }
 
@@ -74,16 +83,22 @@ struct TempMailApp {
 }
 
 impl TempMailApp {
-    pub fn new(tx: Sender<Event>, rx: Receiver<EventResponse>) -> Self {
-        let name = Self::gen_random_name(10);
+    pub fn new(
+        tx: Sender<Event>,
+        rx: Receiver<EventResponse>,
+        name: Option<String>,
+        domain: Option<String>,
+    ) -> Self {
+        let name = name.unwrap_or(Self::gen_random_name(10));
+        let domain = domain.unwrap_or("vwh.sh".into());
         let _ = tx.send(Event::FetchDomanins);
 
         Self {
             name,
-            fetching: true,
+            domain,
             events: tx,
             responses: rx,
-            domain: "vwh.sh".into(),
+            fetching: true,
             emails: Default::default(),
             viewed_email: Default::default(),
             domains: Default::default(),
@@ -317,7 +332,7 @@ impl App for TempMailApp {
                 ui.set_width(ui.available_width());
 
                 ui.horizontal(|ui| {
-                    ui.heading(self.email());
+                    ui.heading([" ", &self.email()].join(""));
                     if ui.button("copy").clicked() {
                         ctx.copy_text(self.email());
                     }
@@ -346,5 +361,20 @@ impl App for TempMailApp {
                 };
             });
         });
+    }
+
+    fn save(&mut self, storage: &mut dyn eframe::Storage) {
+        storage.set_string("name", self.name.clone());
+        storage.set_string("domain", self.domain.clone());
+    }
+
+    fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {}
+
+    fn auto_save_interval(&self) -> std::time::Duration {
+        std::time::Duration::from_secs(30)
+    }
+
+    fn persist_egui_memory(&self) -> bool {
+        true
     }
 }
