@@ -1,7 +1,7 @@
 use std::sync::mpsc::{Receiver, Sender};
 
 use log::error;
-use tmapi::{Client, Email};
+use tmapi::{Attachment, Client, Email};
 use tokio::runtime::Handle;
 
 pub enum Event {
@@ -12,6 +12,7 @@ pub enum Event {
     FetchEmail(String),
     FetchDomanins,
     CountEmails(String),
+    GetAttachments(String),
 }
 
 pub enum EventResponse {
@@ -22,6 +23,7 @@ pub enum EventResponse {
     Count(u32),
     EmailsDeleted,
     EmailDeleted(usize),
+    Attachments(Vec<Attachment>),
 }
 
 pub struct Handler {
@@ -46,6 +48,7 @@ impl Handler {
                 Event::FetchDomanins => self.fetch_domains(),
                 Event::CountEmails(email) => self.fetch_count(email),
                 Event::FetchMoreEmails(email, offset) => self.fetch_emails(email, offset),
+                Event::GetAttachments(id) => self.get_attachments(id),
             }
         }
     }
@@ -117,6 +120,19 @@ impl Handler {
                 let _ = self.response_stream.send(EventResponse::Domains(domains));
             }
             Err(e) => error!("Could not fetch domains: {e:?}"),
+        }
+    }
+
+    fn get_attachments(&self, id: String) {
+        let client = Client::new("example@example.com").unwrap();
+        let attachments = Handle::current().block_on(client.get_attachments(id));
+        match attachments {
+            Ok(attachments) => {
+                let _ = self
+                    .response_stream
+                    .send(EventResponse::Attachments(attachments));
+            }
+            Err(e) => error!("Could not fetch attachments: {e:?}"),
         }
     }
 }
