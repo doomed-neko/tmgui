@@ -48,17 +48,15 @@ impl TempMailApp {
             ui.vertical_centered_justified(|ui| {
                 ui.set_width(ui.available_width());
 
-                self.top_bar(ui, ctx);
-
                 if self.viewed_email.is_some() && ui.button("Back to email list").clicked() {
                     self.viewed_email = None;
                     self.attachments = None;
-                } else if self.viewed_email.is_none()
-                    && !self.name.is_empty()
-                    && ui.button("Fetch emails").clicked()
-                {
-                    self.send_event(Event::FetchEmails(self.email()));
-                    self.send_event(Event::CountEmails(self.email()));
+                } else if self.viewed_email.is_none() {
+                    self.top_bar(ui, ctx);
+                    if !self.name.is_empty() && ui.button("Fetch emails").clicked() {
+                        self.send_event(Event::FetchEmails(self.email()));
+                        self.send_event(Event::CountEmails(self.email()));
+                    }
                 }
 
                 ui.spacing();
